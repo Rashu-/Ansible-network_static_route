@@ -9,16 +9,17 @@
 
 - name: Add/remove nxos static routes
   nxos_static_route:    
-      prefix: "{{ item.prefix | default(omit) }}"
-      tag: "{{ item.route_tag | default('up') }}"
+      prefix: "{{ item.prefix }}"
+      next_hop: "{{ item.next_hop }}"      
+      tag: "{{ item.route_tag | default(omit) }}"
       state: "{{ item.state | default('present') }}"
-      next_hop: "{{ item.next_hop | default(omit) }}"
       route_name:  "{{ item.nh_name | default(omit) }}"
       pref: "{{ item.admin_distance | default(omit) }}"
       vrf: "{{ item.vrf | default(omit) }}"
-  with_items: "{{ static_routes }}"    
+  loop: "{{ static_routes }}"    
   when: >
-    ansible_network_os == 'nxos'  
+    ansible_network_os == 'nxos' and
+    static_routes is defined 
   tags: 
     - static_routes_config
     - nxos
